@@ -102,3 +102,6 @@ ENV/
 
 #mac stuff
 .ds_store
+
+#key stuff
+auth_key.py
