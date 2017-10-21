@@ -1,17 +1,23 @@
 import http.server
-from auth_key import *
+import queue
+import urllib.parse
+#from auth_key import *
 
 serverAddress, serverPort = ("", 18888)
+driftingBottles = queue.LifoQueue()
 
 class TwilioRequestHandler(http.server.BaseHTTPRequestHandler):
     def do_POST(self):
         try:
-            self.send_response(204) #no content
-            print(self.requestline)
             bodyLength = int(self.headers["Content-Length"])
             requestBody = self.rfile.read(bodyLength).decode("utf-8").split("&")
             twilioRequest = dict({tuple(i.split("=")) for i in requestBody})
-            print(twilioRequest)
+            twilioRequest["From"] = urllib.parse.unquote_plus(twilioRequest["From"],"utf-8")
+            twilioRequest["Body"] = urllib.parse.unquote_plus(twilioRequest["Body"],"utf-8")
+            #print(twilioRequest["From"])
+            #print(twilioRequest["Body"])
+            driftingBottles.put((twilioRequest["From"],twilioRequest["Body"]),block=False)
+            self.send_response(204) #no content
         except:
             self.send_error(418) #teapot!
         finally:
@@ -21,4 +27,3 @@ daemon = http.server.HTTPServer((serverAddress, serverPort), TwilioRequestHandle
 daemon.timeout = 1 #in seconds
 while True:
     daemon.handle_request()
-    print("tick!")
