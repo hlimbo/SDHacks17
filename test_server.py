@@ -18,4 +18,7 @@ class TwilioRequestHandler(http.server.BaseHTTPRequestHandler):
             self.end_headers()
 
 daemon = http.server.HTTPServer((serverAddress, serverPort), TwilioRequestHandler)
-daemon.serve_forever()
+daemon.timeout = 1 #in seconds
+while True:
+    daemon.handle_request()
+    print("tick!")
