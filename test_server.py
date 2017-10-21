@@ -30,6 +30,9 @@ class TwilioRequestHandler(http.server.BaseHTTPRequestHandler):
                 else:
                     client.messages.create(to=twilioRequest["From"], from_=myNumber,body="You already joined!")
             elif twilioRequest["Body"].upper() not in keywords:
+                if twilioRequest["From"] not in users:
+                    users[twilioRequest["From"]] = startingP
+                    client.messages.create(to=twilioRequest["From"], from_=myNumber,body="You just joined!")
                 driftingBottles.put((twilioRequest["From"],twilioRequest["Body"]),block=False)
                 users[twilioRequest["From"]] += pPerSend
             self.send_response(204) #no content
