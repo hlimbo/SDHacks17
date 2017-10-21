@@ -1,7 +1,7 @@
 import http.server
 import queue
 import urllib.parse
-#import queueProcessor
+import queueProcessor
 from auth_key import *
 from twilio.rest import Client
 
@@ -43,4 +43,4 @@ daemon = http.server.HTTPServer((serverAddress, serverPort), TwilioRequestHandle
 daemon.timeout = 1 #in seconds
 while True:
     daemon.handle_request()
-    #driftingBottles,users = queueProcessor.processQueue(driftingBottles,users)
+    driftingBottles,users = queueProcessor.processQueue(driftingBottles,users)
