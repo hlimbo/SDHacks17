@@ -1,12 +1,12 @@
 import http.server
 import queue
 import urllib.parse
-#from auth_key import *
 import queueProcessor
 
 serverAddress, serverPort = ("", 18888)
 driftingBottles = queue.Queue()
 users = dict()
+keywords = {"STOP", "STOPALL", "UNSUBSCRIBE", "CANCEL", "END", "QUIT", "START", "YES", "UNSTOP", "HELP", "INFO", "JOIN"}
 
 startingP = 60000
 pPerSend = 2500
@@ -19,12 +19,11 @@ class TwilioRequestHandler(http.server.BaseHTTPRequestHandler):
             twilioRequest = dict({tuple(i.split("=")) for i in requestBody})
             twilioRequest["From"] = urllib.parse.unquote_plus(twilioRequest["From"],"utf-8")
             twilioRequest["Body"] = urllib.parse.unquote_plus(twilioRequest["Body"],"utf-8")
-            #print(twilioRequest["From"])
-            #print(twilioRequest["Body"])
             if twilioRequest["From"] not in users:
                 users[twilioRequest["From"]] = startingP
-            users[twilioRequest["From"]] += pPerSend
-            driftingBottles.put((twilioRequest["From"],twilioRequest["Body"]),block=False)
+            if twilioRequest["Body"].upper() not in keywords:
+                driftingBottles.put((twilioRequest["From"],twilioRequest["Body"]),block=False)
+                users[twilioRequest["From"]] += pPerSend
             self.send_response(204) #no content
         except:
             self.send_error(418) #teapot!
