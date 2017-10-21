@@ -4,7 +4,7 @@ import urllib.parse
 #from auth_key import *
 
 serverAddress, serverPort = ("", 18888)
-driftingBottles = queue.LifoQueue()
+driftingBottles = queue.Queue()
 
 class TwilioRequestHandler(http.server.BaseHTTPRequestHandler):
     def do_POST(self):
