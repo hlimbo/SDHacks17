@@ -1,20 +1,35 @@
-# create a function that accepts a queue object of messages send via text
+from auth_key import *
+from twilio.rest import Client
 import queue
+
+pThreshold = 50000
+pCostPerMessage = 10000
 
 # lower values are higher priority in pq in python
 # driftingbottles is queue that holds a collection of tuples
-def processQueue(driftingbottles):
+def processQueue(messages, users):
+    for user in users.keys():
+        users[user] += 1 #age priority every tick
 
-	print("hi")
-	try:
-		print("a")		
-		fromData = driftingbottles.get_nowait()
-		print("b")
-		print("fromData ",fromData)
-	except:
-		print("no messages in queue")
-		pass	
-
-	print("bye")		
-	# return 2 queues, 1st queue drifting bottles queue, 2nd queue of the users
-	#return driftingbottles
+    if len(users) > 0:
+        client = Client(account_sid, auth_token)
+        recipient = max(users.items(), key=lambda x:x[1])[0]
+        print(recipient)
+        print(users[recipient])
+        try:
+            message = messages.get(block=False)
+            print(message)
+            
+            if users[recipient] >= pThreshold:
+                if recipient == message[0]:
+                    messages.put(message,block=False)
+                else:
+                    print("SMS sent")
+                    client.messages.create(to=recipient,from_=myNumber,body=message[1])
+                    users[recipient] -= pCostPerMessage
+            else:
+                messages.put(message,block=False)
+        except:
+            pass
+    #return 2 queues, 1st queue drifting bottles queue, 2nd dict of the users
+    return messages,users
