@@ -2,7 +2,7 @@ import http.server
 import queue
 import urllib.parse
 #from auth_key import *
-#import some file that we create that holds a function that processes the queue contents
+import queueProcessor
 
 serverAddress, serverPort = ("", 18888)
 driftingBottles = queue.Queue()
@@ -28,4 +28,16 @@ daemon = http.server.HTTPServer((serverAddress, serverPort), TwilioRequestHandle
 daemon.timeout = 1 #in seconds
 while True:
     daemon.handle_request()
-	#function to make here
+    #driftingBottles = queueProcessor.processQueue(driftingBottles)
+
+    print("hi")
+    try:
+        print("a")		
+        fromData = driftingBottles.get_nowait()
+        print("b")
+        print("fromData ",fromData)
+    except:
+        print("no messages in queue")
+        pass	
+
+    print("bye")		
