@@ -2,6 +2,7 @@ import http.server
 import queue
 import urllib.parse
 #from auth_key import *
+#import some file that we create that holds a function that processes the queue contents
 
 serverAddress, serverPort = ("", 18888)
 driftingBottles = queue.Queue()
@@ -27,3 +28,4 @@ daemon = http.server.HTTPServer((serverAddress, serverPort), TwilioRequestHandle
 daemon.timeout = 1 #in seconds
 while True:
     daemon.handle_request()
+	#function to make here
