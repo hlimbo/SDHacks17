@@ -8,7 +8,7 @@ from twilio.rest import Client
 serverAddress, serverPort = ("", 18888)
 driftingBottles = queue.Queue()
 users = dict()
-keywords = {"STOP", "STOPALL", "UNSUBSCRIBE", "CANCEL", "END", "QUIT", "START", "YES", "UNSTOP", "HELP", "INFO", "JOIN"}
+keywords = {"STOP", "STOPALL", "UNSUBSCRIBE", "CANCEL", "END", "QUIT", "START", "YES", "UNSTOP", "HELP", "INFO"}
 
 startingP = 60000
 pPerSend = 2500
