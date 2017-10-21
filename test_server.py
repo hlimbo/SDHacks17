@@ -15,7 +15,7 @@ class TwilioRequestHandler(http.server.BaseHTTPRequestHandler):
         except:
             self.send_error(418) #teapot!
         finally:
-            pass
+            self.end_headers()
 
 daemon = http.server.HTTPServer((serverAddress, serverPort), TwilioRequestHandler)
 daemon.serve_forever()
