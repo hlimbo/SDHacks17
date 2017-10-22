@@ -5,13 +5,14 @@ import random
 pThreshold = 30000
 pCostPerMessage = 10000
 poolSizeBeforeSend = 5
+minUserCount = 1
 
 def processQueue(messages, users):
     for user in users.keys():
         print('#:', user, 'priority:', users[user].priority, 'count:', users[user].numMessages)
         users[user].priority += 1 #age priority every tick
 
-    if len(users) > 0 and len(messages) >= poolSizeBeforeSend:
+    if len(users) > minUserCount and len(messages) >= poolSizeBeforeSend:
         client = Client(account_sid, auth_token)
 
         recipient = max(users.items(), key=lambda x:x[1].priority)[0]
