@@ -42,7 +42,7 @@ class TwilioRequestHandler(http.server.BaseHTTPRequestHandler):
                         users[sender].numMessages += 1
                         driftingBottles.append((sender,body))
                     else:
-                        client.messages.create(to=sender,from_=myNumber,body="You have too many bottles floating in the ocean right now. Wait for someone to pick it up.")                        
+                        client.messages.create(to=sender,from_=myNumber,body="You have too many bottles floating in the ocean right now. Wait for someone to pick one up.")                        
 
             self.send_response(204) #no content
         except Exception as ex:
