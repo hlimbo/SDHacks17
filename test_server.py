@@ -23,7 +23,7 @@ class TwilioRequestHandler(http.server.BaseHTTPRequestHandler):
             twilioRequest = dict({tuple(i.split("=")) for i in requestBody})
             twilioRequest["From"] = urllib.parse.unquote_plus(twilioRequest["From"],"utf-8")
             twilioRequest["Body"] = urllib.parse.unquote_plus(twilioRequest["Body"],"utf-8")
-            if twilioRequest["Body"] == "JOIN":
+            if twilioRequest["Body"].upper() == "JOIN":
                 if twilioRequest["From"] not in users:
                     users[twilioRequest["From"]] = startingP
                     client.messages.create(to=twilioRequest["From"], from_=myNumber,body="You just joined!")
