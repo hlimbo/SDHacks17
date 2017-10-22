@@ -20,20 +20,22 @@ class TwilioRequestHandler(http.server.BaseHTTPRequestHandler):
             bodyLength = int(self.headers["Content-Length"])
             requestBody = self.rfile.read(bodyLength).decode("utf-8").split("&")
             twilioRequest = dict({tuple(i.split("=")) for i in requestBody})
-            twilioRequest["From"] = urllib.parse.unquote_plus(twilioRequest["From"],"utf-8")
-            twilioRequest["Body"] = urllib.parse.unquote_plus(twilioRequest["Body"],"utf-8")
-            if twilioRequest["Body"].upper() == "JOIN":
-                if twilioRequest["From"] not in users:
-                    users[twilioRequest["From"]] = startingP
-                    client.messages.create(to=twilioRequest["From"],from_=myNumber,body="You just joined!")
+            
+            sender = urllib.parse.unquote_plus(twilioRequest["From"],"utf-8")
+            body = urllib.parse.unquote_plus(twilioRequest["Body"],"utf-8")
+            
+            if body.upper() == "JOIN":
+                if sender not in users:
+                    users[sender] = startingP
+                    client.messages.create(to=sender,from_=myNumber,body="You just joined!")
                 else:
-                    client.messages.create(to=twilioRequest["From"],from_=myNumber,body="You already joined!")
-            elif twilioRequest["Body"].upper() not in keywords:
-                if twilioRequest["From"] not in users:
-                    users[twilioRequest["From"]] = startingP
-                    client.messages.create(to=twilioRequest["From"],from_=myNumber,body="You just joined!")
-                driftingBottles.append((twilioRequest["From"],twilioRequest["Body"]))
-                users[twilioRequest["From"]] += pPerSend
+                    client.messages.create(to=sender,from_=myNumber,body="You already joined!")
+            elif body.upper() not in keywords:
+                if sender not in users:
+                    users[sender] = startingP
+                    client.messages.create(to=sender,from_=myNumber,body="You just joined!")
+                driftingBottles.append((sender,body))
+                users[sender] += pPerSend
             self.send_response(204) #no content
         except Exception as ex:
             print(ex)
