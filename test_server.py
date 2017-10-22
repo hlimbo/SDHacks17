@@ -1,12 +1,11 @@
 import http.server
-import queue
 import urllib.parse
 import queueProcessor
 from auth_key import *
 from twilio.rest import Client
 
 serverAddress, serverPort = ("", 18888)
-driftingBottles = queue.Queue()
+driftingBottles = []
 users = dict()
 keywords = {"STOP", "STOPALL", "UNSUBSCRIBE", "CANCEL", "END", "QUIT", "START", "YES", "UNSTOP", "HELP", "INFO"}
 
@@ -26,14 +25,14 @@ class TwilioRequestHandler(http.server.BaseHTTPRequestHandler):
             if twilioRequest["Body"].upper() == "JOIN":
                 if twilioRequest["From"] not in users:
                     users[twilioRequest["From"]] = startingP
-                    client.messages.create(to=twilioRequest["From"], from_=myNumber,body="You just joined!")
+                    client.messages.create(to=twilioRequest["From"],from_=myNumber,body="You just joined!")
                 else:
-                    client.messages.create(to=twilioRequest["From"], from_=myNumber,body="You already joined!")
+                    client.messages.create(to=twilioRequest["From"],from_=myNumber,body="You already joined!")
             elif twilioRequest["Body"].upper() not in keywords:
                 if twilioRequest["From"] not in users:
                     users[twilioRequest["From"]] = startingP
-                    client.messages.create(to=twilioRequest["From"], from_=myNumber,body="You just joined!")
-                driftingBottles.put((twilioRequest["From"],twilioRequest["Body"]),block=False)
+                    client.messages.create(to=twilioRequest["From"],from_=myNumber,body="You just joined!")
+                driftingBottles.append((twilioRequest["From"],twilioRequest["Body"]))
                 users[twilioRequest["From"]] += pPerSend
             self.send_response(204) #no content
         except Exception as ex:
