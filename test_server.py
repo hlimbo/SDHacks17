@@ -6,11 +6,18 @@ from twilio.rest import Client
 
 serverAddress, serverPort = ("", 18888)
 driftingBottles = []
-users = dict()
+users = {}
 keywords = {"STOP", "STOPALL", "UNSUBSCRIBE", "CANCEL", "END", "QUIT", "START", "YES", "UNSTOP", "HELP", "INFO"}
 
 startingP = 60000
 pPerSend = 2500
+
+class User:
+    def __init__(self, priority, numMessages):
+        super(User, self).__init__()
+        self.priority = priority
+        self.numMessages = numMessages
+        
 
 class TwilioRequestHandler(http.server.BaseHTTPRequestHandler):
     def do_POST(self):
@@ -24,18 +31,19 @@ class TwilioRequestHandler(http.server.BaseHTTPRequestHandler):
             sender = urllib.parse.unquote_plus(twilioRequest["From"],"utf-8")
             body = urllib.parse.unquote_plus(twilioRequest["Body"],"utf-8")
             
-            if body.upper() == "JOIN":
+            if body.upper() not in keywords:
+                
                 if sender not in users:
-                    users[sender] = startingP
+                    users[sender] = User(priority = startingP, numMessages = 1)
                     client.messages.create(to=sender,from_=myNumber,body="You just joined!")
                 else:
-                    client.messages.create(to=sender,from_=myNumber,body="You already joined!")
-            elif body.upper() not in keywords:
-                if sender not in users:
-                    users[sender] = startingP
-                    client.messages.create(to=sender,from_=myNumber,body="You just joined!")
-                driftingBottles.append((sender,body))
-                users[sender] += pPerSend
+                    if users[sender].numMessages < 5:
+                        users[sender].priority += pPerSend
+                        users[sender].numMessages += 1
+                        driftingBottles.append((sender,body))
+                    else:
+                        client.messages.create(to=sender,from_=myNumber,body="You have sents in too many texts")                        
+
             self.send_response(204) #no content
         except Exception as ex:
             print(ex)
@@ -43,8 +51,10 @@ class TwilioRequestHandler(http.server.BaseHTTPRequestHandler):
         finally:
             self.end_headers()
 
+
 daemon = http.server.HTTPServer((serverAddress, serverPort), TwilioRequestHandler)
 daemon.timeout = 1 #in seconds
 while True:
     daemon.handle_request()
     driftingBottles,users = queueProcessor.processQueue(driftingBottles,users)
+
