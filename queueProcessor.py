@@ -2,7 +2,7 @@ from auth_key import *
 from twilio.rest import Client
 import random
 
-pThreshold = 30000
+pThreshold = 50000
 pCostPerMessage = 10000
 poolSizeBeforeSend = 5
 

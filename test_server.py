@@ -35,14 +35,14 @@ class TwilioRequestHandler(http.server.BaseHTTPRequestHandler):
                 
                 if sender not in users:
                     users[sender] = User(priority = startingP, numMessages = 1)
-                    client.messages.create(to=sender,from_=myNumber,body="You just joined!")
+                    client.messages.create(to=sender,from_=myNumber,body="Welcome to Bottles Adrift.")
                 else:
                     if users[sender].numMessages < 5:
                         users[sender].priority += pPerSend
                         users[sender].numMessages += 1
                         driftingBottles.append((sender,body))
                     else:
-                        client.messages.create(to=sender,from_=myNumber,body="You have sents in too many texts")                        
+                        client.messages.create(to=sender,from_=myNumber,body="You have too many bottles floating in the ocean right for. Wait for someone to pick it up.")                        
 
             self.send_response(204) #no content
         except Exception as ex:
